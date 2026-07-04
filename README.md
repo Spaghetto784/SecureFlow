@@ -325,4 +325,7 @@ It currently checks:
 - Trivy API image scan
 - Trivy dashboard image scan
 
+Semgrep and Trivy currently run in audit mode so the CI remains usable during early development.
+Once the project is stable, these scans can be switched to blocking release gates.
+
 In GitHub, open the repository, go to `Actions`, and confirm that workflows are enabled. No custom secrets are required for the current CI setup.

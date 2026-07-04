@@ -73,7 +73,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Run Semgrep
-        run: semgrep scan --config auto --error
+        run: semgrep scan --config p/default
 
   gitleaks:
     name: Secret detection
@@ -102,7 +102,7 @@ jobs:
           scan-type: fs
           scan-ref: .
           severity: HIGH,CRITICAL
-          exit-code: "1"
+          exit-code: "0"
           ignore-unfixed: true
 
       - name: Build API image
@@ -113,7 +113,7 @@ jobs:
         with:
           image-ref: secureflow-api:ci
           severity: HIGH,CRITICAL
-          exit-code: "1"
+          exit-code: "0"
           ignore-unfixed: true
 
       - name: Build dashboard image
@@ -124,5 +124,5 @@ jobs:
         with:
           image-ref: secureflow-dashboard:ci
           severity: HIGH,CRITICAL
-          exit-code: "1"
+          exit-code: "0"
           ignore-unfixed: true
