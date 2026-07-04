@@ -131,12 +131,14 @@ GitHub Actions
 
 ### Backend
 
-- FastAPI / Spring Boot
+- FastAPI
 - PostgreSQL
 
 ### Frontend
 
 - React
+- Vite
+- TypeScript
 
 ### DevOps
 
@@ -204,3 +206,123 @@ Developed as a personal portfolio project to demonstrate practical skills in:
 - AWS Infrastructure
 - CI/CD Automation
 - Application Security
+
+---
+
+## 🚦 Local Setup
+
+### Prerequisites
+
+- Docker Desktop
+- Python 3.12
+- Git
+
+### Start the application
+
+```bash
+cp .env.example .env
+docker compose up --build
+```
+
+The API is available at:
+
+- API: `http://localhost:8000`
+- Health check: `http://localhost:8000/health`
+- OpenAPI docs: `http://localhost:8000/docs`
+- Dashboard: `http://localhost:5173`
+
+### Try authentication
+
+Create a user:
+
+```bash
+curl -X POST http://localhost:8000/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"email":"ada@example.com","password":"correct-horse-battery"}'
+```
+
+Login:
+
+```bash
+curl -X POST http://localhost:8000/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"ada@example.com","password":"correct-horse-battery"}'
+```
+
+Use the returned `access_token` as a Bearer token for:
+
+```text
+GET /users/me
+```
+
+### Run backend tests locally
+
+```bash
+cd backend
+python -m venv .venv
+source .venv/bin/activate
+pip install ".[dev]"
+ruff check .
+pytest
+```
+
+### Run frontend locally
+
+```bash
+cd frontend
+npm install
+npm run lint
+npm run build
+npm run dev
+```
+
+The dashboard expects the API at `http://localhost:8000` by default. Override it with:
+
+```bash
+VITE_API_BASE_URL=http://localhost:8000 npm run dev
+```
+
+---
+
+## 🧱 Current Implementation Status
+
+- FastAPI backend scaffold
+- `/health` endpoint
+- React security dashboard
+- Frontend login and registration flow
+- DevSecOps scan overview UI
+- User registration and login
+- JWT-protected `/users/me` endpoint
+- SQLAlchemy user model
+- Alembic database migrations
+- PostgreSQL service via Docker Compose
+- Dockerized API
+- Dockerized frontend
+- GitHub Actions CI
+- Ruff linting
+- Pytest test suite
+- Frontend ESLint and production build
+- Semgrep SAST
+- Gitleaks secret detection
+- Trivy filesystem, API image, and dashboard image scanning
+
+---
+
+## ✅ GitHub Actions Setup
+
+The workflow in `.github/workflows/ci.yml` runs automatically on:
+
+- Pull requests
+- Pushes to `main`
+
+It currently checks:
+
+- Backend lint and tests
+- Frontend lint and build
+- Semgrep SAST
+- Gitleaks secret detection
+- Trivy filesystem scan
+- Trivy API image scan
+- Trivy dashboard image scan
+
+In GitHub, open the repository, go to `Actions`, and confirm that workflows are enabled. No custom secrets are required for the current CI setup.
