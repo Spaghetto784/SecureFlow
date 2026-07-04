@@ -255,6 +255,14 @@ Use the returned `access_token` as a Bearer token for:
 GET /users/me
 ```
 
+Security reports are also protected by JWT:
+
+```text
+GET /security/reports
+GET /security/findings
+POST /security/scans/run
+```
+
 ### Run backend tests locally
 
 ```bash
@@ -291,6 +299,9 @@ VITE_API_BASE_URL=http://localhost:8000 npm run dev
 - React security dashboard
 - Frontend login and registration flow
 - DevSecOps scan overview UI
+- Dynamic security reports from the API
+- Simulated security scan trigger
+- Security findings inventory
 - User registration and login
 - JWT-protected `/users/me` endpoint
 - SQLAlchemy user model

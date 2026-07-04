@@ -11,6 +11,7 @@ import {
   KeyRound,
   Lock,
   LogOut,
+  Play,
   Radar,
   ShieldCheck,
   Siren,
@@ -18,68 +19,24 @@ import {
 } from "lucide-react";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 
-import { AuthMode, User, authenticate, fetchCurrentUser, healthCheck } from "./api";
+import {
+  AuthMode,
+  SecurityFinding,
+  SecurityReport,
+  User,
+  authenticate,
+  fetchCurrentUser,
+  fetchSecurityFindings,
+  fetchSecurityReports,
+  healthCheck,
+  runSecurityScan,
+} from "./api";
 
 type ServiceHealth = {
   status: string;
   service: string;
   environment: string;
 };
-
-type ScanStatus = "passed" | "running" | "attention";
-
-type Scan = {
-  name: string;
-  description: string;
-  status: ScanStatus;
-  findings: number;
-  icon: typeof ShieldCheck;
-};
-
-const scans: Scan[] = [
-  {
-    name: "Semgrep SAST",
-    description: "Static analysis for insecure code patterns",
-    status: "passed",
-    findings: 0,
-    icon: Code2,
-  },
-  {
-    name: "Gitleaks",
-    description: "Repository secret detection",
-    status: "passed",
-    findings: 0,
-    icon: KeyRound,
-  },
-  {
-    name: "Dependency Scan",
-    description: "Python and frontend dependency review",
-    status: "running",
-    findings: 1,
-    icon: Radar,
-  },
-  {
-    name: "Trivy Container",
-    description: "Container image vulnerability scan",
-    status: "passed",
-    findings: 0,
-    icon: Container,
-  },
-  {
-    name: "OWASP ZAP",
-    description: "Dynamic application security test",
-    status: "attention",
-    findings: 3,
-    icon: Siren,
-  },
-  {
-    name: "Terraform Checks",
-    description: "Infrastructure-as-code validation",
-    status: "running",
-    findings: 0,
-    icon: Cloud,
-  },
-];
 
 const timeline = [
   "Code pushed to GitHub",
@@ -89,6 +46,16 @@ const timeline = [
   "Deployment gate awaiting approval",
 ];
 
+const scanIcons: Record<string, typeof ShieldCheck> = {
+  "Semgrep SAST": Code2,
+  Gitleaks: KeyRound,
+  "Dependency Scan": Radar,
+  "Trivy Container": Container,
+  "OWASP ZAP": Siren,
+  "Terraform Checks": Cloud,
+  "Manual Security Scan": ShieldCheck,
+};
+
 function App() {
   const [health, setHealth] = useState<ServiceHealth | null>(null);
   const [healthError, setHealthError] = useState("");
@@ -97,8 +64,12 @@ function App() {
   const [password, setPassword] = useState("correct-horse-battery");
   const [token, setToken] = useState(() => localStorage.getItem("secureflow_token") ?? "");
   const [user, setUser] = useState<User | null>(null);
+  const [reports, setReports] = useState<SecurityReport[]>([]);
+  const [findings, setFindings] = useState<SecurityFinding[]>([]);
   const [authError, setAuthError] = useState("");
+  const [dashboardError, setDashboardError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isRunningScan, setIsRunningScan] = useState(false);
 
   useEffect(() => {
     healthCheck()
@@ -120,10 +91,30 @@ function App() {
       });
   }, [token]);
 
+  useEffect(() => {
+    if (!token || !user) {
+      return;
+    }
+
+    Promise.all([fetchSecurityReports(token), fetchSecurityFindings(token)])
+      .then(([nextReports, nextFindings]) => {
+        setReports(nextReports);
+        setFindings(nextFindings);
+        setDashboardError("");
+      })
+      .catch((error: Error) => setDashboardError(error.message));
+  }, [token, user]);
+
   const riskScore = useMemo(() => {
-    const findings = scans.reduce((total, scan) => total + scan.findings, 0);
-    return Math.max(0, 100 - findings * 9);
-  }, []);
+    const penalty = findings.reduce((total, finding) => {
+      const weights = { info: 1, low: 3, medium: 8, high: 18, critical: 30 };
+      return total + weights[finding.severity];
+    }, 0);
+    return Math.max(0, 100 - penalty);
+  }, [findings]);
+
+  const criticalFindings = findings.filter((finding) => finding.severity === "critical").length;
+  const passedReports = reports.filter((report) => report.status === "passed").length;
 
   async function handleAuth(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -145,6 +136,30 @@ function App() {
     localStorage.removeItem("secureflow_token");
     setToken("");
     setUser(null);
+    setReports([]);
+    setFindings([]);
+  }
+
+  async function handleRunScan() {
+    if (!token) {
+      return;
+    }
+
+    setDashboardError("");
+    setIsRunningScan(true);
+    try {
+      await runSecurityScan(token);
+      const [nextReports, nextFindings] = await Promise.all([
+        fetchSecurityReports(token),
+        fetchSecurityFindings(token),
+      ]);
+      setReports(nextReports);
+      setFindings(nextFindings);
+    } catch (error) {
+      setDashboardError(error instanceof Error ? error.message : "Unable to run scan");
+    } finally {
+      setIsRunningScan(false);
+    }
   }
 
   return (
@@ -265,8 +280,16 @@ function App() {
           <>
             <section className="metrics-grid" id="overview">
               <Metric title="Risk score" value={`${riskScore}%`} detail="Current secure delivery score" />
-              <Metric title="Critical findings" value="0" detail="Blocking production release" />
-              <Metric title="Checks passed" value="4/6" detail="Automated controls completed" />
+              <Metric
+                title="Critical findings"
+                value={`${criticalFindings}`}
+                detail="Blocking production release"
+              />
+              <Metric
+                title="Checks passed"
+                value={`${passedReports}/${reports.length || 0}`}
+                detail="Automated controls completed"
+              />
               <Metric title="Runtime" value={health?.status ?? "unknown"} detail="FastAPI container health" />
             </section>
 
@@ -276,12 +299,32 @@ function App() {
                   <p className="eyebrow">Automated security controls</p>
                   <h2>Scan coverage</h2>
                 </div>
-                <span className="badge">CI/CD gated</span>
+                <button className="secondary-button" onClick={handleRunScan} disabled={isRunningScan}>
+                  <Play size={16} />
+                  {isRunningScan ? "Running..." : "Run scan"}
+                </button>
               </div>
 
+              {dashboardError ? <p className="form-error">{dashboardError}</p> : null}
+
               <div className="scan-grid">
-                {scans.map((scan) => (
-                  <ScanCard key={scan.name} scan={scan} />
+                {reports.map((report) => (
+                  <ScanCard key={report.id} report={report} />
+                ))}
+              </div>
+            </section>
+
+            <section className="section-band" id="findings">
+              <div className="section-heading">
+                <div>
+                  <p className="eyebrow">Security reports</p>
+                  <h2>Open findings</h2>
+                </div>
+                <span className="badge">{findings.length} tracked</span>
+              </div>
+              <div className="findings-list">
+                {findings.map((finding) => (
+                  <FindingRow key={finding.id} finding={finding} />
                 ))}
               </div>
             </section>
@@ -336,21 +379,40 @@ function Metric({ title, value, detail }: { title: string; value: string; detail
   );
 }
 
-function ScanCard({ scan }: { scan: Scan }) {
-  const Icon = scan.icon;
-  const StatusIcon = scan.status === "attention" ? AlertTriangle : CheckCircle2;
+function ScanCard({ report }: { report: SecurityReport }) {
+  const Icon = scanIcons[report.tool] ?? ShieldCheck;
+  const StatusIcon = report.status === "attention" || report.status === "failed" ? AlertTriangle : CheckCircle2;
 
   return (
-    <article className={`scan-card ${scan.status}`}>
+    <article className={`scan-card ${report.status}`}>
       <div className="scan-top">
         <Icon size={22} />
         <StatusIcon size={18} />
       </div>
-      <h3>{scan.name}</h3>
-      <p>{scan.description}</p>
+      <h3>{report.tool}</h3>
+      <p>{report.summary}</p>
       <div className="scan-footer">
-        <span>{scan.status}</span>
-        <strong>{scan.findings} findings</strong>
+        <span>{report.status}</span>
+        <strong>{report.findings_count} findings</strong>
+      </div>
+    </article>
+  );
+}
+
+function FindingRow({ finding }: { finding: SecurityFinding }) {
+  return (
+    <article className="finding-row">
+      <div>
+        <span className={`severity ${finding.severity}`}>{finding.severity}</span>
+      </div>
+      <div>
+        <h3>{finding.title}</h3>
+        <p>{finding.description}</p>
+        <small>{finding.recommendation}</small>
+      </div>
+      <div className="finding-meta">
+        <strong>{finding.status}</strong>
+        <span>{finding.target}</span>
       </div>
     </article>
   );
