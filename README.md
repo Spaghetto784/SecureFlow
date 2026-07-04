@@ -1,239 +1,204 @@
-# 🛡️ SecureFlow — DevSecOps CI/CD Platform
+# SecureFlow
 
-> **A production-inspired DevSecOps platform demonstrating how modern applications can be built, tested, secured and deployed through a fully automated CI/CD pipeline.**
+> DevSecOps CI/CD platform built as a portfolio project to demonstrate secure software delivery, automated security checks, containerized services, and a security-focused dashboard.
 
----
+SecureFlow shows how a modern application can be developed, tested, scanned, and prepared for deployment with security controls integrated into the delivery workflow from the beginning.
 
-## 📖 Overview
-
-SecureFlow is a personal project designed to demonstrate modern DevSecOps practices by combining software development, cloud infrastructure, automation and application security into a single end-to-end platform.
-
-The project reproduces the complete software delivery lifecycle used in modern companies, where every code change is automatically tested, analyzed, secured and deployed.
-
-Rather than focusing only on application development, SecureFlow emphasizes **Security by Design**, integrating security controls directly into the CI/CD workflow.
+The project is intentionally production-inspired: it includes an authenticated API, a React dashboard, PostgreSQL persistence, Docker Compose, database migrations, automated tests, and GitHub Actions security checks.
 
 ---
 
-## 🎯 Objectives
+## What It Demonstrates
 
-- Demonstrate DevSecOps best practices
-- Automate software delivery
-- Secure the Software Development Life Cycle (SDLC)
-- Implement Infrastructure as Code
-- Deploy applications securely on AWS
-- Build a portfolio project inspired by real enterprise environments
+SecureFlow is designed to show practical skills in:
+
+- DevSecOps engineering
+- Secure backend development
+- Authentication and authorization
+- CI/CD automation
+- Dockerized application delivery
+- Security scanning automation
+- Security report centralization
+- PostgreSQL-backed API development
+- Portfolio-ready dashboard design
 
 ---
 
-## 🚀 Features
+## Current Features
 
-- REST API
-- User authentication & authorization
-- Dockerized application
+### Application
+
+- FastAPI REST API
+- React + TypeScript dashboard
 - PostgreSQL database
-- GitHub Actions CI/CD pipeline
-- Automated testing
-- Infrastructure as Code (Terraform)
-- AWS deployment
-- Security reports
-- Monitoring & logging
+- Docker Compose environment
+- User registration and login
+- JWT-protected routes
+- Security reports and findings API
+- Simulated security scan trigger
+- OpenAPI documentation with Swagger
+
+### Security Controls
+
+- Semgrep SAST workflow
+- Gitleaks secret detection workflow
+- Trivy filesystem scan
+- Trivy backend image scan
+- Trivy frontend image scan
+- Password hashing with Argon2
+- JWT authentication
+- CORS configured for the dashboard
+
+### Engineering Quality
+
+- Pytest backend tests
+- Ruff backend linting
+- ESLint frontend linting
+- TypeScript production build
+- Alembic database migrations
+- GitHub Actions CI pipeline
 
 ---
 
-## 🔐 Integrated Security Controls
-
-The CI/CD pipeline automatically performs security checks on every commit.
-
-### Static Security
-
-- Semgrep (SAST)
-- Secret Detection (Gitleaks)
-- Dependency Vulnerability Scanning
-
-### Container Security
-
-- Docker Image Scanning (Trivy)
-
-### Dynamic Security
-
-- OWASP ZAP (DAST)
-
-### Cloud Security
-
-- Secure IAM configuration
-- Least Privilege Principle
-- Infrastructure validation
-- Terraform security checks
-
----
-
-## ⚙️ DevSecOps Pipeline
+## Architecture
 
 ```text
-Developer
-     │
-     ▼
-GitHub Repository
-     │
-     ▼
-GitHub Actions
-     │
-     ├── Code Quality
-     ├── Unit Tests
-     ├── Semgrep (SAST)
-     ├── Gitleaks
-     ├── Dependency Scan
-     ├── Trivy Scan
-     ├── Build Docker Image
-     ├── OWASP ZAP (DAST)
-     └── Terraform Deployment
-                 │
-                 ▼
-                AWS
+Browser
+  |
+  v
+React Dashboard
+  |
+  v
+FastAPI Backend
+  |
+  v
+PostgreSQL
+
+GitHub Push
+  |
+  v
+GitHub Actions CI
+  |
+  +-- Backend lint and tests
+  +-- Frontend lint and build
+  +-- Semgrep SAST
+  +-- Gitleaks secret detection
+  +-- Trivy dependency and container scans
 ```
 
 ---
 
-## 🏗️ Architecture
+## Tech Stack
 
-```text
-                +----------------------+
-                |      Developer       |
-                +----------+-----------+
-                           |
-                           v
-                    GitHub Repository
-                           |
-                           v
-                  GitHub Actions CI/CD
-                           |
-      +--------------------+--------------------+
-      |                    |                    |
-      v                    v                    v
-   Security            Build & Test        Infrastructure
-     Scans                                   as Code
-      |                    |                    |
-      +--------------------+--------------------+
-                           |
-                           v
-                    Docker Container
-                           |
-                           v
-                     AWS Cloud Platform
-                           |
-                           v
-                 Monitoring & Logging
-```
+| Area | Technologies |
+| --- | --- |
+| Frontend | React, TypeScript, Vite, CSS |
+| Backend | FastAPI, Pydantic, SQLAlchemy |
+| Database | PostgreSQL |
+| Auth | JWT, Argon2 password hashing |
+| Migrations | Alembic |
+| DevOps | Docker, Docker Compose, GitHub Actions |
+| Security | Semgrep, Gitleaks, Trivy |
+| Tests | Pytest, Ruff, ESLint |
 
 ---
 
-## 🛠️ Technologies
-
-### Backend
-
-- FastAPI
-- PostgreSQL
-
-### Frontend
-
-- React
-- Vite
-- TypeScript
-
-### DevOps
-
-- Docker
-- GitHub Actions
-- Terraform
-
-### Cloud
-
-- AWS
-
-### Security
-
-- Semgrep
-- Gitleaks
-- Trivy
-- OWASP ZAP
-
----
-
-## 📚 Skills Demonstrated
-
-- DevSecOps
-- Cloud Security
-- CI/CD Automation
-- Infrastructure as Code
-- Secure Software Development
-- Docker
-- AWS
-- Application Security
-- Security Automation
-- Infrastructure Deployment
-
----
-
-## 📈 Future Improvements
-
-- Kubernetes deployment
-- GitOps with ArgoCD
-- SIEM integration
-- OpenID Connect authentication
-- Security Dashboard
-- Policy as Code
-- Multi-cloud deployment
-- Threat Modeling module
-- AI-powered vulnerability prioritization
-
----
-
-## 🎯 Project Goal
-
-SecureFlow aims to demonstrate how security can be integrated throughout the entire software development lifecycle.
-
-Instead of treating security as a final verification step, this project automates security validation from source code to production deployment, following modern DevSecOps principles adopted by leading technology companies.
-
----
-
-## 👨‍💻 Author
-
-Developed as a personal portfolio project to demonstrate practical skills in:
-
-- DevSecOps Engineering
-- Cloud Security
-- Secure Software Engineering
-- AWS Infrastructure
-- CI/CD Automation
-- Application Security
-
----
-
-## 🚦 Local Setup
+## Local Setup
 
 ### Prerequisites
 
-- Docker Desktop
-- Python 3.12
-- Git
+Install:
 
-### Start the application
+- Docker with Docker Compose
+- Git
+- Python 3.12, only if you want to run backend tests outside Docker
+- Node.js, only if you want to run frontend checks outside Docker
+
+### Start the full platform
+
+From the project root:
 
 ```bash
 cp .env.example .env
-docker compose up --build
+docker compose up -d --build
 ```
 
-The API is available at:
+Check that all services are running:
 
-- API: `http://localhost:8000`
-- Health check: `http://localhost:8000/health`
-- OpenAPI docs: `http://localhost:8000/docs`
+```bash
+docker compose ps
+```
+
+You should see:
+
+- `secureflow-api-1`
+- `secureflow-db-1`
+- `secureflow-frontend-1`
+
+### Open the application
+
 - Dashboard: `http://localhost:5173`
+- API health check: `http://localhost:8000/health`
+- Swagger API docs: `http://localhost:8000/docs`
 
-### Try authentication
+---
 
-Create a user:
+## How To Test The Project
+
+### 1. Test the dashboard
+
+Open:
+
+```text
+http://localhost:5173
+```
+
+Create an account with a valid email:
+
+```text
+demo@example.com
+```
+
+Use a password with at least 12 characters:
+
+```text
+correct-horse-battery
+```
+
+After login, the dashboard should show:
+
+- Risk score
+- CI/CD security scan cards
+- Open security findings
+- Pipeline activity
+- Runtime inventory
+- A `Run scan` button
+
+Click `Run scan` to create a simulated security report through the backend API.
+
+### 2. Test the API with Swagger
+
+Open:
+
+```text
+http://localhost:8000/docs
+```
+
+Useful endpoints:
+
+- `GET /health`
+- `POST /auth/register`
+- `POST /auth/login`
+- `GET /users/me`
+- `GET /security/reports`
+- `GET /security/findings`
+- `POST /security/scans/run`
+
+Protected endpoints require a Bearer token from `/auth/login`.
+
+### 3. Test with curl
+
+Register:
 
 ```bash
 curl -X POST http://localhost:8000/auth/register \
@@ -249,21 +214,26 @@ curl -X POST http://localhost:8000/auth/login \
   -d '{"email":"ada@example.com","password":"correct-horse-battery"}'
 ```
 
-Use the returned `access_token` as a Bearer token for:
+Use the returned `access_token` as:
+
+```text
+Authorization: Bearer YOUR_TOKEN
+```
+
+Then test:
 
 ```text
 GET /users/me
-```
-
-Security reports are also protected by JWT:
-
-```text
 GET /security/reports
 GET /security/findings
 POST /security/scans/run
 ```
 
-### Run backend tests locally
+---
+
+## Run Checks Locally
+
+### Backend
 
 ```bash
 cd backend
@@ -274,69 +244,125 @@ ruff check .
 pytest
 ```
 
-### Run frontend locally
+### Frontend
 
 ```bash
 cd frontend
 npm install
 npm run lint
 npm run build
-npm run dev
 ```
 
-The dashboard expects the API at `http://localhost:8000` by default. Override it with:
+---
+
+## Docker Commands
+
+Start or rebuild everything:
 
 ```bash
-VITE_API_BASE_URL=http://localhost:8000 npm run dev
+docker compose up -d --build
+```
+
+View running services:
+
+```bash
+docker compose ps
+```
+
+View API logs:
+
+```bash
+docker compose logs api --tail 80
+```
+
+View frontend logs:
+
+```bash
+docker compose logs frontend --tail 80
+```
+
+Stop everything:
+
+```bash
+docker compose down
+```
+
+Reset the local database volume:
+
+```bash
+docker compose down -v
 ```
 
 ---
 
-## 🧱 Current Implementation Status
+## GitHub Actions
 
-- FastAPI backend scaffold
-- `/health` endpoint
-- React security dashboard
-- Frontend login and registration flow
-- DevSecOps scan overview UI
-- Dynamic security reports from the API
-- Simulated security scan trigger
-- Security findings inventory
-- User registration and login
-- JWT-protected `/users/me` endpoint
-- SQLAlchemy user model
-- Alembic database migrations
-- PostgreSQL service via Docker Compose
-- Dockerized API
-- Dockerized frontend
-- GitHub Actions CI
-- Ruff linting
-- Pytest test suite
-- Frontend ESLint and production build
+The CI workflow is defined in:
+
+```text
+.github/workflows/ci.yml
+```
+
+It runs on:
+
+- Pushes to `main`
+- Pull requests
+
+Current jobs:
+
+- Backend quality and tests
+- Frontend quality and build
 - Semgrep SAST
 - Gitleaks secret detection
-- Trivy filesystem, API image, and dashboard image scanning
+- Trivy dependency and container scan
+
+Semgrep and Trivy currently run in audit mode so the pipeline remains usable during early development. Later, these checks can be made blocking for critical vulnerabilities.
+
+No custom GitHub secrets are required for the current CI setup.
 
 ---
 
-## ✅ GitHub Actions Setup
+## Project Structure
 
-The workflow in `.github/workflows/ci.yml` runs automatically on:
+```text
+SecureFlow
+├── backend
+│   ├── app
+│   │   ├── auth
+│   │   ├── core
+│   │   ├── db
+│   │   ├── security
+│   │   └── users
+│   ├── alembic
+│   └── tests
+├── frontend
+│   └── src
+├── .github
+│   └── workflows
+├── docker-compose.yml
+└── README.md
+```
 
-- Pull requests
-- Pushes to `main`
+---
 
-It currently checks:
+## Roadmap
 
-- Backend lint and tests
-- Frontend lint and build
-- Semgrep SAST
-- Gitleaks secret detection
-- Trivy filesystem scan
-- Trivy API image scan
-- Trivy dashboard image scan
+Planned improvements:
 
-Semgrep and Trivy currently run in audit mode so the CI remains usable during early development.
-Once the project is stable, these scans can be switched to blocking release gates.
+- Import real Semgrep, Gitleaks, and Trivy reports into the dashboard
+- Add frontend tests
+- Add role-based authorization
+- Add AWS infrastructure with Terraform
+- Add deployment pipeline
+- Add monitoring and logging
+- Add OWASP ZAP DAST automation
+- Add Kubernetes deployment
+- Add policy-as-code checks
 
-In GitHub, open the repository, go to `Actions`, and confirm that workflows are enabled. No custom secrets are required for the current CI setup.
+---
+
+## Project Goal
+
+The goal of SecureFlow is to demonstrate that security can be integrated throughout the full software delivery lifecycle.
+
+Instead of treating security as a final manual review, SecureFlow automates checks and centralizes security results in a dashboard that developers can use during delivery.
